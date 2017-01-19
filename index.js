@@ -16,6 +16,9 @@ var mapChild = function (child) {
 
 module.exports = function (filename, opts) {
     opts = opts || {
+        plugins: [{
+            removeAttrs: {attrs: 'fill'}
+        }]
     };
     if (!filename) {
         throw new gutil.PluginError('gulp-svg-symbol-sprite', 'filename is required');
@@ -42,7 +45,7 @@ module.exports = function (filename, opts) {
                     name: 'symbol',
                     attrs: {
                         id: id,
-                        viewbox: json.attributes.viewbox
+                        viewbox: json.attributes.viewbox || json.attributes.viewBox
                     },
                     children: json.children.map(mapChild)
                 };
