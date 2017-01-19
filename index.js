@@ -6,7 +6,8 @@ var parser = require('xml2json');
 var SVGO = require('svgo');
 
 module.exports = function (filename, opts) {
-    opts = opts || {};
+    opts = opts || {
+    };
     if (!filename) {
         throw new gutil.PluginError('gulp-svg-symbol-sprite', 'filename is required');
     }
@@ -29,16 +30,29 @@ module.exports = function (filename, opts) {
 
                 var svg = json.svg || {};
                 var viewbox = svg.viewbox || svg.viewBox;
-                var svgpath = Array.isArray(svg.path) ? svg.path : [svg.path];
-                var symbol = {
-                    id: id,
-                    viewbox: viewbox,
-                    path: svgpath.map(function(p) {
-                        return {d: p.d};
-                    })
-                };
 
-                symbols.push(symbol);
+                var svgpath;
+                if (svg.path) {
+                    svgpath = Array.isArray(svg.path) ? svg.path : [svg.path];
+                }
+                if (svg.g) {
+                    svgpath = Array.isArray(svg.g.path) ? svg.g.path : [svg.g.path];
+                }
+
+                if (svgpath && svgpath.length > 0) {
+                    var symbol = {
+                        id: id,
+                        viewbox: viewbox,
+                        path: svgpath.map(function(p) {
+                            return {d: p.d};
+                        })
+                    };
+
+                    symbols.push(symbol);
+                } else {
+                    gutil.log(gutil.colors.yellow('gulp-svg-symbol-sprite'), 'Skipped file: ' + path.parse(file.path).base, 'could not find <path> or <g>');
+                }
+
                 cb();
             });
         }
