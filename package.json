@@ -19,6 +19,9 @@
     "symbol",
     "gulp"
   ],
+  "files": [
+    "index.js"
+  ],
   "author": "Steffen Müller",
   "license": "MIT",
   "devDependencies": {
