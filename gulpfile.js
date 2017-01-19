@@ -3,7 +3,7 @@ var gulp = require('gulp');
 var sprite = require('./');
 
 gulp.task('default', function () {
-    return gulp.src(['fixture/*.svg'])
+    return gulp.src(['fixture/cart.svg'])
         .pipe(sprite('my-sprites.svg'))
         .pipe(gulp.dest('dest'));
 });

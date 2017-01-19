@@ -2,8 +2,17 @@
 var path = require('path');
 var gutil = require('gulp-util');
 var through = require('through2');
-var parser = require('xml2json');
 var SVGO = require('svgo');
+var svgParser = require('svg-parser');
+var jsontoxml = require('jsontoxml');
+
+var mapChild = function (child) {
+    var mappedChild = {name: child.name, attrs: child.attributes};
+    if (child.children && child.children.length > 0) {
+        mappedChild.children = child.children.map(mapChild)
+    }
+    return mappedChild;
+}
 
 module.exports = function (filename, opts) {
     opts = opts || {
@@ -23,52 +32,28 @@ module.exports = function (filename, opts) {
             var json;
             svgo.optimize(file.contents, function(result) {
                 try {
-                    json = JSON.parse(parser.toJson(result.data));
+                    json = svgParser.parse(result.data);
                 } catch (err) {
-                    cb(err);
+                    gutil.log(gutil.colors.red('gulp-svg-symbol-sprite'), 'Skipped file: ' + path.parse(file.path).base, 'could not parse file');
+                    return cb();
                 }
 
-                var svg = json.svg || {};
-                var viewbox = svg.viewbox || svg.viewBox;
-
-                var svgpath;
-                if (svg.path) {
-                    svgpath = Array.isArray(svg.path) ? svg.path : [svg.path];
-                }
-                if (svg.g) {
-                    svgpath = Array.isArray(svg.g.path) ? svg.g.path : [svg.g.path];
-                }
-
-                if (svgpath && svgpath.length > 0) {
-                    var symbol = {
+                var symbol = {
+                    name: 'symbol',
+                    attrs: {
                         id: id,
-                        viewbox: viewbox,
-                        path: svgpath.map(function(p) {
-                            return {d: p.d};
-                        })
-                    };
-
-                    symbols.push(symbol);
-                } else {
-                    gutil.log(gutil.colors.yellow('gulp-svg-symbol-sprite'), 'Skipped file: ' + path.parse(file.path).base, 'could not find <path> or <g>');
-                }
-
+                        viewbox: json.attributes.viewbox
+                    },
+                    children: json.children.map(mapChild)
+                };
+                symbols.push(symbol);
                 cb();
             });
         }
 
     }, function (cb) {
-        var svgJson = {
-            'svg': {
-                height: 0,
-                width: 0,
-                style: 'position: absolute',
-                xmlns: 'http://www.w3.org/2000/svg',
-                'xmlns:xlink': 'http://www.w3.org/1999/xlink',
-                symbol: symbols
-            }
-        }
-        var data = parser.toXml(svgJson);
+        var data = '<svg height="0" style="position: absolute" width="0" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' + jsontoxml(symbols) + '</svg>';
+
         this.push(new gutil.File({
             cwd: latestFile.cwd,
             base: latestFile.base,
