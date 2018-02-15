@@ -20,8 +20,7 @@ gulp.task('svg', function () {
 ```jsx
 import React from 'react';
 import classnames from 'classnames';
-import icons from './my-icons.json';
-import { find } from 'lodash';
+import icons from './icons';
 
 export default class Icon extends React.Component {
     static propTypes = {
@@ -34,9 +33,10 @@ export default class Icon extends React.Component {
 
     render() {
         const { name } = this.props;
-        const icon = find(icons, i => i.attrs.id === name);
+        const icon = icons.find(i => i.attrs.id === name);
         if (!icon) {
             console.warn(`Icon '${icon}' not found`);
+            return false;
         }
         return (
             <svg {...icon.attrs} {...this.props} className={classnames(`icon icon-${this.props.name}`, this.props.className)}>
