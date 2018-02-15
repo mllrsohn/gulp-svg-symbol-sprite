@@ -25,14 +25,15 @@
   "author": "Steffen Müller",
   "license": "MIT",
   "devDependencies": {
-    "gulp": "^3.9.1"
+    "gulp": "^3.9.1",
+    "prettier": "^1.10.2"
   },
   "dependencies": {
     "gulp-util": "^3.0.8",
-    "jsontoxml": "^0.0.11",
-    "jstoxml": "^0.2.4",
+    "jsontoxml": "^1.0.0",
+    "jstoxml": "^1.1.3",
     "svg-parser": "^1.0.5",
-    "svgo": "^0.7.1",
+    "svgo": "^1.0.4",
     "through2": "^2.0.3"
   }
 }
