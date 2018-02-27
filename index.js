@@ -55,7 +55,7 @@ module.exports = function(output, opts) {
                         name: 'symbol',
                         attrs: {
                             id: id,
-                            viewbox: json.attributes.viewbox || json.attributes.viewBox
+                            viewBox: json.attributes.viewbox || json.attributes.viewBox
                         },
                         children: json.children.map(mapChild)
                     };
